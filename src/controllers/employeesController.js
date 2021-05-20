@@ -1,68 +1,73 @@
 'use strict'
 
-const validator = require('validator');
-
-const Employee = require('../models/empleado');
+const model = require('../models/index');
 
 const controller = {
-    list: (req, res) => {
-        res.send('listado de empleados');
-    },
-    signup: (req, res) => {
-        const params = req.body;
-
-        //validando los datos recibidos
+    list: async (req, res, next) => {
         try {
-            var validate_name = !validator.isEmpty(params.name);
-            var validate_lastName = !validator.isEmpty(params.last_name);
-            var validate_phone = !validator.isEmpty(params.phone);
-            var validate_account = !validator.isEmpty(params.account);
-            var validate_cc = !validator.isEmpty(params.cc);
-            var validate_email = !validator.isEmpty(params.email);
-            var validate_password = !validator.isEmpty(params.password);
-
-        } catch (error) {
-            res.status(404).send({
+            const list = await model.Employee.find().sort({ 'createdAt': -1 });
+            if (list.length < 1) return res.status(404).send({
                 status: 'error',
-                message: 'Datos incompletos, no se puede hacer el registro',
-                error
-            });
-        }
-        if (validate_name && validate_lastName && validate_phone && validate_account &&
-            validate_cc && validate_email && validate_password) {
-
-            const employee = new Employee();
-            employee.name = params.name;
-            employee.last_name = params.last_name;
-            employee.phone = params.phone;
-            employee.account = params.account;
-            employee.cc = params.cc;
-            employee.email = params.email;
-            employee.password = params.password;
-
-            employee.save((err, empStrored) => {
-                if (err || empStrored) {
-                    return res.status(404).send({
-                        status: 'error',
-                        message: 'El empleado no pudo ser registrado'
-                    });
-                }
-                return res.status(200).send({
-                    status: 'success',
-                    message: 'Empleado registrado exitosamente',
-                    empStrored
-                });
+                message: 'Aún no hay empleados registrados que puedan ser lsitados'
             });
             return res.status(200).send({
                 status: 'success',
-                message: 'Empleado registrado exitosamente',
+                message: 'Listado de empleados existente',
+                list
+            });
+        } catch (error) {
+            res.status(500).send({
+                status: 'error',
+                message: 'Error en el proceso'
+            });
+            next(error);
+        }
+    },
+    signup: async (req, res, next) => {
+        const { name, last_name, phone, account, cc, email, password } = req.body;
+
+        try {
+            const employee = await model.Employee.create({
+                name,
+                last_name,
+                phone,
+                account,
+                cc,
+                email,
+                password
+            });
+            res.status(200).send({
+                status: 'success',
+                message: 'Empleado registrado con exito',
                 employee
             });
-        } else {
-            return res.status(404).send({
+        } catch (error) {
+            res.status(500).send({
                 status: 'error',
-                message: 'Datos no validos'
+                messagge: 'Error en el proceso de registro, debe ingresar todos los datos ya que todos son requeridos'
             });
+            next(error);
+        }
+    },
+    find: async (req, res, next) => {
+        const id = req.query._id;
+        try {
+            const employee = await model.Employee.findOne({ _id: id });
+            if (!employee) return res.status(404).send({
+                status: 'error',
+                message: 'Empleado no registrado en la base de datos'
+            });
+            return res.status(200).send({
+                status: 'success',
+                message: 'Empleado resgistrado en la base de datos',
+                employee
+            });
+        } catch (error) {
+            res.status(500).send({
+                status: 'error',
+                message: 'Error en el proceso'
+            });
+            next(error);
         }
     }
 };

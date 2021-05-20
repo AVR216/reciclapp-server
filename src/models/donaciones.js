@@ -2,10 +2,9 @@ const {Schema, model} = require('mongoose');
 
 const donationSchema = new Schema({
     materials: [],
-    donor: {type: Schema.ObjectId, ref: "user"},
-    collector: {type: Schema.ObjectId, ref: "employee"},
-    state: Boolean,
-    weight : Number,
+    donor: {type: Schema.ObjectId, ref: "User", required: true},
+    weight : {type: Number, required: true},
+    state: {type: Boolean, required: true, default: false}
 },{
     timestamps: true
 });
