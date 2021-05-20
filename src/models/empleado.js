@@ -6,6 +6,7 @@ const empleadoSchema = new Schema({
     phone: {type: Number, required: true},
     account: {type: Number, required: true},
     cc : {type: Number, required: true},
+    role: {type: Boolean, required: true, default: false}, 
     email: {type: String, maxlength: 60, required: true, unique: true},
     password: {type: String, maxlength: 15, required: true}
 }, {

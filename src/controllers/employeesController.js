@@ -24,7 +24,7 @@ const controller = {
         }
     },
     signup: async (req, res, next) => {
-        const { name, last_name, phone, account, cc, email, password } = req.body;
+        const { name, last_name, phone, account, cc, role, email, password } = req.body;
 
         try {
             const employee = await model.Employee.create({
@@ -33,6 +33,7 @@ const controller = {
                 phone,
                 account,
                 cc,
+                role,
                 email,
                 password
             });
