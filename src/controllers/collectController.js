@@ -64,6 +64,29 @@ const controller = {
             });
             next(error);
         }
+    },
+    getCollectsEmp: async (req, res, next) => {
+        
+        const id = req.query.id; //id del empleado
+
+        try {
+            const collectsList = await model.Collect.find({ collector: id }).sort({'createdAt': -1});
+            if(collectsList.length < 1) return res.status(404).send({
+                status: 'error',
+                message: 'No tiene recogidas asignadas',
+            });
+            return res.status(200).send({
+                status: 'success',
+                message: 'Listado de donaciones del usuario',
+                collectsList
+            });
+        } catch (error) {
+            res.status(500).send({
+                status: 'error',
+                message: 'La petición no puede ser procesada por el servidor'
+            });
+            next(error);
+        }
     }
 };
 

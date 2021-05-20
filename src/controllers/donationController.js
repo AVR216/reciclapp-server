@@ -63,6 +63,27 @@ const controller = {
             });
             next(error);
         }
+    },
+    getDonationsUser: async (req, res, next)=>{
+        const id = req.query.id; //id del usuario
+        try {
+            const donationsList = await model.Donation.find({ donor: id }).sort({'createdAt': -1});
+            if(donationsList.length < 1) return res.status(404).send({
+                status: 'error',
+                message: 'El usuario no tiene historial de donaciones',
+            });
+            return res.status(200).send({
+                status: 'success',
+                message: 'Listado de donaciones del usuario',
+                donationsList
+            });
+        } catch (error) {
+            res.status(500).send({
+                status: 'error',
+                message: 'La petición no puede ser procesada por el servidor'
+            });
+            next(error);
+        }
     }
 };
 
